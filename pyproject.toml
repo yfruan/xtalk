@@ -1,0 +1,133 @@
+[build-system]
+requires = ["setuptools>=68", "wheel", "setuptools_scm[toml]>=8"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name            = "xtalk"
+description     = "AI conversational agent framework"
+readme          = "README.md"
+authors         = [{ name = "xcc", email = "2867389537@qq.com" }]
+license         = { text = "MIT" }
+requires-python = ">=3.10"
+dependencies    = [
+  "langchain >=0.3.0, <0.4.0",
+  "langchain-core >=0.3.0, <0.4.0",
+  "langchain-openai",
+  "langchain-chroma",
+  "fastapi",
+  "numpy",
+  "aiohttp"
+]
+dynamic         = ["version"]
+
+[project.optional-dependencies]
+dev  = ["pytest", "pytest-cov"]
+ali = [
+  "dashscope >=1.25.3"
+]
+elevenlabs = [
+  "websockets"
+]
+chattts = [
+  "ChatTTS",
+  "torch",
+  "torchaudio"
+]
+f5tts = [
+  "f5-tts",
+  "torch",
+  "torchaudio"
+]
+kokoro = [
+  "kokoro >=0.9.4",
+  "soundfile",
+  "misaki[zh]",
+  "misaki[ja]"
+]
+bark = [
+  "transformers >=4.45.0",
+  "scipy",
+  "torch"
+]
+cosyvoice-local = [
+  "grpcio",
+  "grpcio-tools", 
+  "numpy",
+  "soundfile",
+  "librosa",
+  "soxr"
+]
+index-tts = [
+  "requests",
+  "soundfile",
+  "soxr",
+  "numpy"
+]
+gpt-sovits = [
+  "soundfile",
+  "soxr",
+]
+paraformer-local = [
+  "torch",
+  "torchaudio",
+  "funasr",
+  "huggingface_hub",
+  "modelscope"
+]
+sense-voice-small = [
+  "torch",
+  "torchaudio",
+  "funasr",
+  "huggingface_hub",
+  "modelscope"
+]
+sherpa-onnx-asr = [
+  "websockets",
+]
+ct-punt = [
+  "torch",
+  "torchaudio",
+  "funasr",
+  "huggingface_hub",
+  "modelscope"
+]
+zipformer-local = [
+  "numpy>=1.21",
+  "sherpa-onnx",
+  "soundfile"
+]
+llm-local = [
+  "transformers >=4.45.0",
+  "torch",
+  "accelerate"
+]
+whisper = [
+  "openai-whisper"
+]
+ten-turn-detection = [
+  "transformers >=4.45.0",
+  "torch",
+]
+edge-tts = [
+  "edge-tts"
+]
+silero-vad = [
+  "torch",
+]
+rubberband = [
+  "pyrubberband"
+]
+pyannote = ["pyannote.audio","torchvision"]
+example = [
+  "pypdf"
+]
+[tool.setuptools]
+package-dir = {"" = "src"}
+
+[tool.setuptools_scm]
+version_scheme = "post-release"
+local_scheme   = "no-local-version"
+
+[tool.pytest.ini_options]
+addopts   = ["--import-mode=importlib", "-q"]
+testpaths = ["tests"]

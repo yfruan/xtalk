@@ -1,0 +1,95 @@
+syntax = "proto3";
+
+package audio_inference;
+
+// Audio inference service
+service AudioInferenceService {
+    // Audio recognition RPC
+    rpc RecognizeAudio(AudioRequest) returns (AudioResponse);
+    
+    // Health check RPC
+    rpc HealthCheck(HealthRequest) returns (HealthResponse);
+}
+
+// Audio request payload
+message AudioRequest {
+    // Raw audio bytes (numpy array serialization)
+    bytes audio_data = 1;
+    
+    // Shape for reconstructing numpy array
+    repeated int32 audio_data_shape = 2;
+    
+    // Path to load audio if audio_data is empty
+    string audio_path = 3;
+    
+    // Sample rate
+    int32 sample_rate = 4;
+    
+    // Task type
+    string task = 5;
+    
+    // Language code
+    string lang = 6;
+    
+    // Speaker ID
+    string speaker = 7;
+    
+    // Reference text
+    string text = 8;
+    
+    // Data identifier
+    string key = 9;
+    
+    // Audio duration (seconds)
+    float duration = 10;
+}
+
+// Audio response payload
+message AudioResponse {
+    // Success flag
+    bool success = 1;
+    
+    // Error details
+    string error_message = 2;
+    
+    // Recognition text
+    string result_text = 3;
+    
+    // Inference time (seconds)
+    float inference_time = 4;
+    
+    // Audio path
+    string audio_path = 5;
+    
+    // Data identifier
+    string key = 6;
+    
+    // Task type
+    string task = 7;
+    
+    // Language code
+    string lang = 8;
+    
+    // Speaker ID
+    string speaker = 9;
+    
+    // Prompt used
+    string prompt = 10;
+    
+    // Total processing time (seconds)
+    float total_time = 11;
+}
+
+// Health check request
+message HealthRequest {
+    // Optional health check parameters
+}
+
+// Health check response
+message HealthResponse {
+    // Health status
+    string status = 1;
+    
+    // Additional message
+    string message = 2;
+}
