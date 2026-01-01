@@ -110,7 +110,7 @@ We will use APIs from AliCloud to demonstrate the basic capability of **X-Talk**
 First, install dependencies for AliCloud and server script:
 ```bash
 pip install "xtalk[ali] @ git+https://github.com/xcc-zach/xtalk.git@main"
-pip install jinja2 'uvicorn[standard]'
+pip install jinja2 python-multipart 'uvicorn[standard]'
 ```
 
 Then, obtain an API key from [AliCloud Bailian Platform](https://bailian.console.aliyun.com/?tab=model#/api-key). We will be using free-tier service from AliCloud.
