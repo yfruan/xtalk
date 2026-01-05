@@ -90,6 +90,18 @@ async def get_reference_audios():
     return JSONResponse(content={"audios": voices})
 
 
+# Get available TTS models
+@app.get("/api/available-tts-models")
+async def get_available_tts_models():
+    return JSONResponse(content={"models": ["CosyVoiceLocal"]})
+
+
+# Get available LLM models
+@app.get("/api/available-llm-models")
+async def get_available_llm_models():
+    return JSONResponse(content={"models": ["OllamaAgent", "DefaultAgent"]})
+
+
 if __name__ == "__main__":
     import uvicorn
 

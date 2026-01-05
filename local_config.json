@@ -1,0 +1,34 @@
+{
+    "asr": {
+    "type": "SenseVoiceSmallLocal",
+    "params": {
+      "model": "/Users/yfruan/.cache/modelscope/hub/iic/SenseVoiceSmall",
+      "device": "mps",
+      "hub": "ms",
+      "vad_model": "/Users/yfruan/.cache/modelscope/hub/iic/speech_fsmn_vad_zh-cn-16k-common-pytorch"
+    }
+  },
+    "llm_agent": {
+        "type": "OllamaAgent",
+        "params": {
+            "model": {
+                "model": "qwen2.5:14b-instruct",
+                "temperature": 0.7
+            }
+        }
+    },
+    "tts": {
+        "type": "CosyVoiceLocal",
+        "params": {
+            "host": "localhost",
+            "port": 50000,
+            "mode": "zero_shot_by_spk_id",
+            "spk_id": "001",
+            "sample_rate": 48000,
+            "stream": false,
+            "speed": 1.0,
+            "format": "pcm",
+            "text_frontend": true
+        }
+    }
+}

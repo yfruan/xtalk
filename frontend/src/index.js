@@ -41,10 +41,10 @@ async function ensureOrtVad() {
 
     __ensureOrtVadPromise = (async () => {
         if (!window.ort) {
-            await inject(`https://cdn.jsdelivr.net/npm/onnxruntime-web@${ver}/dist/ort.js`);
+            await inject(`/static/js/lib/onnxruntime-web@${ver}/ort.js`);
         }
         if (!window.vad) {
-            await inject('https://cdn.jsdelivr.net/npm/@ricky0123/vad-web@0.0.27/dist/bundle.min.js');
+            await inject('/static/js/lib/vad-web@0.0.27/bundle.min.js');
         }
     })();
 
@@ -332,7 +332,7 @@ function createAudioSession(onIncomingJson, websocketURL = null, opts = null) {
             // HTML injection is no longer needed; ensureOrtVad() already set window.__ortVersion.
             const isIOSUA = /iPhone|iPad|iPod/i.test(navigator.userAgent);
             const ortVersion = (window.__ortVersion) || (isIOSUA ? '1.17.0' : '1.22.0');
-            ort.env.wasm.wasmPaths = `https://cdn.jsdelivr.net/npm/onnxruntime-web@${ortVersion}/dist/`;
+            ort.env.wasm.wasmPaths = `/static/js/lib/onnxruntime-web@${ortVersion}/`;
 
             // Show FastEnhancer loading info inside the conversation
             const enhancerArrayBuffer = await fetch(fastEnhancerOnnxUrl).then(r => r.arrayBuffer());
@@ -432,8 +432,8 @@ function createAudioSession(onIncomingJson, websocketURL = null, opts = null) {
             enhanceSpeech = async (audioFrame) => audioFrame; // Passthrough
         }
 
-        // Load Silero VAD model (always v5)
-        const vadURL = 'https://cdn.jsdelivr.net/npm/@ricky0123/vad-web@0.0.27/dist/silero_vad_v5.onnx';
+        // Load Silero VAD model (always v5) from local path
+        const vadURL = '/static/js/lib/silero_vad_v5.onnx';
         const vadArrayBuffer = await fetch(vadURL).then(r => r.arrayBuffer());
         const vadSession = await ort.InferenceSession.create(vadArrayBuffer);
 
