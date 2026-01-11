@@ -71,3 +71,11 @@ try:
     __all__.append("FunASR")
 except:
     pass
+
+# MLX FunASR (local)
+try:
+    from .mlx_funasr import MLXFunASR as MLXFunASR
+
+    __all__.append("MLXFunASR")
+except:
+    pass
