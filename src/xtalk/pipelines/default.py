@@ -226,6 +226,29 @@ class DefaultPipeline(Pipeline):
                 sample_rate=sample_rate,
                 timeout=timeout,
             )
+        elif model_type == "MLXCosyVoice3":
+            from ..speech.tts import MLXCosyVoice3
+            
+            model_name = config.get("model", "mlx-community/Fun-CosyVoice3-0.5B-2512-fp16")
+            s3_tokenizer_path = config.get("s3_tokenizer_path")
+            ref_audio = config.get("ref_audio")
+            ref_text = config.get("ref_text")
+            instruct_text = config.get("instruct_text")
+            mode = config.get("mode", "cross-lingual")
+            save_audio_to_file = config.get("save_audio_to_file", False)
+            audio_output_path = config.get("audio_output_path", "./output_audio.wav")
+            
+            self.tts_model = MLXCosyVoice3(
+                model=model_name,
+                s3_tokenizer_path=s3_tokenizer_path,
+                mode=mode,
+                ref_audio=ref_audio,
+                ref_text=ref_text,
+                instruct_text=instruct_text,
+                sample_rate=sample_rate,
+                save_audio_to_file=save_audio_to_file,
+                audio_output_path=audio_output_path,
+            )
         else:
             raise ValueError(f"Unsupported TTS model type: {model_type}")
 
