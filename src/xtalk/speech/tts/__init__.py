@@ -62,3 +62,11 @@ try:
     __all__.append("GPTSoVITS")
 except:
     pass
+
+# MLX CosyVoice3
+try:
+    from .mlx_cosyvoice3 import MLXCosyVoice3 as MLXCosyVoice3
+
+    __all__.append("MLXCosyVoice3")
+except:
+    pass

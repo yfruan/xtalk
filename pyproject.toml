@@ -121,6 +121,10 @@ pyannote = ["pyannote.audio","torchvision"]
 example = [
   "pypdf"
 ]
+mlx-tts = [
+  "mlx-audio-plus >=0.1.4",
+  "mlx-lm == 0.29.1"
+]
 [tool.setuptools]
 package-dir = {"" = "src"}
 
