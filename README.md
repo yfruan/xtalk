@@ -284,7 +284,7 @@ In order to maintain seperate states for a tool in echo agent, you can also use 
 Built-in tools include agent-scope ones like `web_search` and `get_time`, and pipeline control ones like emotion, timbre and speed of speech. `DefaultAgent` has built-in tools registered by default.
     
 > [!NOTE]
-> In order to enable `web_search` tool, `SERPER_API_KEY` needs to be set. See [SerpAPI](https://serpapi.com/).
+> In order to enable `web_search` tool, `SERPER_API_KEY` needs to be set. See [SerperDev](https://serper.dev/).
 
 ### Config the Server
     
