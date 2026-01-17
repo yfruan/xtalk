@@ -1,8 +1,7 @@
 import numpy as np
 import soundfile as sf
-import librosa
 import logging
-from typing import Optional, Generator
+from typing import Optional, Generator, Dict, Any
 from ..interfaces import TTS
 
 # Append dependency helper
@@ -26,9 +25,10 @@ else:
     generate_audio = None  # type: ignore
 
 
-class MLXCosyVoice3(TTS):
+class MLXTTS(TTS):
     """
-    MLX implementation of CosyVoice3 TTS using mlx-audio-plus.
+    MLX implementation of TTS using mlx-audio-plus.
+    Supports multiple TTS models including CosyVoice3, Chatterbox-Turbo-TTS, and others.
     Supports synthesis modes including cross-lingual, zero-shot, instruct, and voice conversion.
     """
 
@@ -76,7 +76,7 @@ class MLXCosyVoice3(TTS):
         self,
         model: str = "mlx-community/Fun-CosyVoice3-0.5B-2512-fp16",
         s3_tokenizer_path: Optional[str] = None,
-        mode: str = "cross-lingual",  # Default to cross-lingual as per web reference
+        mode: str = "cross-lingual",  # Default to cross-lingual for compatibility
         ref_audio: Optional[str] = None,
         ref_text: Optional[str] = None,
         instruct_text: Optional[str] = None,
@@ -84,12 +84,13 @@ class MLXCosyVoice3(TTS):
         format: str = "pcm",  # Default PCM 16-bit
         save_audio_to_file: bool = False,  # Enable/disable audio file saving
         audio_output_path: str = "./output_audio.wav",  # Default output path
+        model_specific_params: Optional[Dict[str, Any]] = None,  # Additional model-specific parameters
     ):
         """
-        Initialize the MLX CosyVoice3 TTS engine.
+        Initialize the MLX TTS engine.
 
         Args:
-            model: Model name or path for mlx-audio-plus.
+            model: Model name or path for mlx-audio-plus (e.g., "mlx-community/Fun-CosyVoice3-0.5B-2512-fp16", "mlx-community/Chatterbox-Turbo-TTS-4bit").
             s3_tokenizer_path: S3 speech tokenizer path (optional, defaults to downloading from Hub).
             mode: Inference mode, supports cross-lingual, zero-shot, instruct, voice_conversion.
             ref_audio: Reference audio path (required for most modes).
@@ -99,9 +100,10 @@ class MLXCosyVoice3(TTS):
             format: Audio format ("pcm" for PCM 16-bit, "" for raw float32).
             save_audio_to_file: Whether to save synthesized audio to a file.
             audio_output_path: Path to save the synthesized audio file.
+            model_specific_params: Additional model-specific parameters to pass to generate_audio.
         """
         if generate_audio is None:
-            raise RuntimeError("mlx-audio-plus is required for MLXCosyVoice3, install via 'pip install -U mlx-audio-plus'")
+            raise RuntimeError("mlx-audio-plus is required for MLXTTS, install via 'pip install -U mlx-audio-plus'")
             
         # Suppress all warnings during tokenizer loading to avoid the mistral regex warning
         import warnings
@@ -129,6 +131,7 @@ class MLXCosyVoice3(TTS):
         self.format = format
         self.save_audio_to_file = save_audio_to_file
         self.audio_output_path = audio_output_path
+        self.model_specific_params = model_specific_params or {}
 
         # Validate mode
         valid_modes = [
@@ -150,7 +153,7 @@ class MLXCosyVoice3(TTS):
                 logging.warning("zero-shot mode without ref_text may result in lower quality")
 
     def clone(self):
-        return MLXCosyVoice3(
+        return MLXTTS(
             model=self.model,
             s3_tokenizer_path=self.s3_tokenizer_path,
             mode=self.mode,
@@ -161,6 +164,7 @@ class MLXCosyVoice3(TTS):
             format=self.format,
             save_audio_to_file=self.save_audio_to_file,
             audio_output_path=self.audio_output_path,
+            model_specific_params=self.model_specific_params.copy() if self.model_specific_params else None,
         )
 
     def close(self):
@@ -202,6 +206,7 @@ class MLXCosyVoice3(TTS):
         ref_text: Optional[str] = None,
         instruct_text: Optional[str] = None,
         source_audio: Optional[str] = None,  # For voice conversion
+        **kwargs,  # Additional model-specific parameters for this synthesis
     ) -> bytes:
         """
         Synthesize speech.
@@ -213,6 +218,7 @@ class MLXCosyVoice3(TTS):
             ref_text: Optional reference text overriding the default (used in zero-shot mode).
             instruct_text: Optional instruction text overriding the default (used in instruct mode).
             source_audio: Source audio path (used in voice_conversion mode).
+            **kwargs: Additional model-specific parameters.
 
         Returns:
             bytes: Synthesized audio payload.
@@ -229,6 +235,11 @@ class MLXCosyVoice3(TTS):
                 "model": self.model,
                 "fix_mistral_regex": True  # Always set fix_mistral_regex=True to avoid tokenizer warning
             }
+
+            # Add model-specific parameters
+            gen_params.update(self.model_specific_params)
+            # Add synthesis-specific parameters
+            gen_params.update(kwargs)
 
             if selected_mode == "cross-lingual":
                 logging.info("Using cross-lingual synthesis mode")
@@ -347,7 +358,9 @@ class MLXCosyVoice3(TTS):
             raise RuntimeError(f"Streaming synthesis failed: {e}")
 
     def convert_audio_bytes_to_ndarray(
-        self, raw_audio: bytes, format: str = None
+        self,
+        raw_audio: bytes,
+        format: str = None
     ) -> np.ndarray:
         """Convert raw bytes to numpy array."""
         if not format or format == "":
@@ -417,3 +430,20 @@ class MLXCosyVoice3(TTS):
         if format not in ["", "pcm"]:
             raise ValueError(f"Unsupported audio format {format}, allowed: '', 'pcm'")
         self.format = format
+
+    def set_model_specific_params(self, params: Dict[str, Any]):
+        """Set model-specific parameters.
+        
+        Args:
+            params: Dictionary of model-specific parameters to pass to generate_audio.
+        """
+        self.model_specific_params = params
+
+    def update_model_specific_params(self, params: Dict[str, Any]):
+        """Update model-specific parameters.
+        
+        Args:
+            params: Dictionary of model-specific parameters to update.
+        """
+        self.model_specific_params.update(params)
+

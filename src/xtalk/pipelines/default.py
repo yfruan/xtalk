@@ -226,8 +226,8 @@ class DefaultPipeline(Pipeline):
                 sample_rate=sample_rate,
                 timeout=timeout,
             )
-        elif model_type == "MLXCosyVoice3":
-            from ..speech.tts import MLXCosyVoice3
+        elif model_type == "MLXTTS":
+            from ..speech.tts import MLXTTS
             
             model_name = config.get("model", "mlx-community/Fun-CosyVoice3-0.5B-2512-fp16")
             s3_tokenizer_path = config.get("s3_tokenizer_path")
@@ -238,7 +238,7 @@ class DefaultPipeline(Pipeline):
             save_audio_to_file = config.get("save_audio_to_file", False)
             audio_output_path = config.get("audio_output_path", "./output_audio.wav")
             
-            self.tts_model = MLXCosyVoice3(
+            self.tts_model = MLXTTS(
                 model=model_name,
                 s3_tokenizer_path=s3_tokenizer_path,
                 mode=mode,

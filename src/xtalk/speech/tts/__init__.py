@@ -63,10 +63,10 @@ try:
 except:
     pass
 
-# MLX CosyVoice3
+# MLX TTS (supports multiple models including CosyVoice3)
 try:
-    from .mlx_cosyvoice3 import MLXCosyVoice3 as MLXCosyVoice3
+    from .mlx_tts import MLXTTS as MLXTTS
 
-    __all__.append("MLXCosyVoice3")
-except:
+    __all__.append("MLXTTS")
+except Exception as e:
     pass
