@@ -61,14 +61,16 @@ async function ensureOrtVad() {
 // - Objects may include { simGen?: bool, sim_gen?: bool, pureFrontend?: bool, pure_frontend?: bool }
 //   pureFrontend = true enables "pure front-end mode": skip VAD/enhancer and only capture+forward raw audio.
 // simGen: when true, never auto-stop/pause TTS except via toggleStreaming().
-function createAudioSession(onIncomingJson, websocketURL = null, opts = false) {
+function createAudioSession(onIncomingJson, websocketURL = null, opts = null) {
     const scriptUrl = new URL(import.meta.url);
     if (typeof onIncomingJson !== 'function') {
         throw new Error('onIncomingJson must be a function');
     }
     // Back-compat: boolean second argument is treated as simGen
-    const simGen = (typeof opts === 'boolean') ? !!opts : !!(opts?.simGen ?? opts?.sim_gen ?? false);
-    const pureFrontend = (typeof opts === 'object' && opts !== null) ? !!(opts.pureFrontend ?? opts.pure_frontend ?? false) : false;
+    const simGen = opts?.simGen ?? false;
+    const pureFrontend = opts?.pureFrontend ?? false;
+    // Server PCM sample rate
+    const TTS_SAMPLE_RATE = opts?.ttsSampleRate ?? 48000;
     let ws = null;
     // Whether to suppress the "Lost connection" notice on the next WS close (one-shot)
     let suppressNextCloseLog = false;
@@ -114,11 +116,8 @@ function createAudioSession(onIncomingJson, websocketURL = null, opts = false) {
     let ttsStreamFinished = false;
     let pendingChunkIndex = null;
 
-    // Server PCM sample rate
-    const TTS_SAMPLE_RATE = 48000;
-
     // Audio context local sample rate
-    const LOCAL_SAMPLE_RATE = 44100;
+    const LOCAL_SAMPLE_RATE = 48000;
 
     // VAD params
     const NEGATIVE_SPEECH_THRESHOLD = 0.2;
@@ -1162,13 +1161,9 @@ function createAudioSession(onIncomingJson, websocketURL = null, opts = false) {
 // New signature:
 // - createConversation({ sim_gen?: bool, simGen?: bool, pure_frontend?: bool, pureFrontend?: bool })
 //   With pure_frontend=true the frontend skips VAD/enhancer and keeps streaming raw audio frames.
-function createConversation(websocketURL = null, sim_gen_or_opts = false) {
-    const SIM_GEN = (typeof sim_gen_or_opts === 'boolean')
-        ? !!sim_gen_or_opts
-        : !!(sim_gen_or_opts?.sim_gen ?? sim_gen_or_opts?.simGen ?? false);
-    const PURE_FRONTEND = (typeof sim_gen_or_opts === 'object' && sim_gen_or_opts !== null)
-        ? !!(sim_gen_or_opts.pure_frontend ?? sim_gen_or_opts.pureFrontend ?? false)
-        : false;
+function createConversation(websocketURL = null, opts = null) {
+    const SIM_GEN = opts?.simGen ?? false;
+    const PURE_FRONTEND = opts?.pureFrontend ?? false;
     // Helper vars
     let lastClientVadStartTs = null;
     let waitingFirstUpdateResp = false;
@@ -1569,7 +1564,7 @@ function createConversation(websocketURL = null, sim_gen_or_opts = false) {
                 updateMessageByTurnOrLast({ role: 'info', content: `Error: ${json.data || 'unknown'}` });
         }
     }
-    audioSession = createAudioSession(onIncomingJson, websocketURL, { simGen: SIM_GEN, pureFrontend: PURE_FRONTEND });
+    audioSession = createAudioSession(onIncomingJson, websocketURL, opts);
     audioSession.initWebSocket();
     state.loading = false;
 
