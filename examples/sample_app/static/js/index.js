@@ -1,6 +1,6 @@
 import { createConversation } from "../../xtalk/index.js";
 
-function getWebSocketURL(path = "ws") {
+function getWebSocketURL() {
     const proto = location.protocol === "https:" ? "wss:" : "ws:";
     const wsPath = new URL("./ws", window.location.href);
     wsPath.protocol = proto;

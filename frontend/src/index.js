@@ -1,3 +1,4 @@
+import fastEnhancerOnnxUrl from "../models/fastenhancer_s.onnx";
 // Create low-level audio/WebSocket session.
 //
 // This file now includes on-demand ORT/VAD loading logic:
@@ -331,8 +332,7 @@ function createAudioSession(onIncomingJson, websocketURL = null, opts = false) {
             ort.env.wasm.wasmPaths = `https://cdn.jsdelivr.net/npm/onnxruntime-web@${ortVersion}/dist/`;
 
             // Show FastEnhancer loading info inside the conversation
-            const enhancerURL = new URL("../fastenhancer_s.onnx", scriptUrl).toString();
-            const enhancerArrayBuffer = await fetch(enhancerURL).then(r => r.arrayBuffer());
+            const enhancerArrayBuffer = await fetch(fastEnhancerOnnxUrl).then(r => r.arrayBuffer());
             enhancerSession = await ort.InferenceSession.create(enhancerArrayBuffer);
 
             // FastEnhancer parameters
