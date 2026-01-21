@@ -909,15 +909,7 @@ function createAudioSession(onIncomingJson, websocketURL = null, opts = null) {
     function playNextAudio() {
         // Do not start when AudioContext is paused
         if (audioCtx && audioCtx.state === 'suspended') return;
-        
-        // Delayed finish handling for TTS stream
-        if (pendingTTSStreamFinished && playingSources.length === 0 && audioQueue.length === 0) {
-            pendingTTSStreamFinished = false;
-            markTTSStreamState('finished');
-            nextScheduledTime = 0;
-            return;
-        }
-        
+
         if (audioQueue.length === 0) {
             if (ttsStreamFinished) return;
 
@@ -940,7 +932,7 @@ function createAudioSession(onIncomingJson, websocketURL = null, opts = null) {
         const currentChunkIndex = queueItem.chunkIndex;
 
         newAudioOutputCallback && newAudioOutputCallback(float32, audioCtx ? audioCtx.sampleRate : LOCAL_SAMPLE_RATE);
-        
+
         // Use local AudioContext sample rate for playback
         const buffer = audioCtx.createBuffer(1, float32.length, audioCtx.sampleRate);
         buffer.getChannelData(0).set(float32);
@@ -948,7 +940,7 @@ function createAudioSession(onIncomingJson, websocketURL = null, opts = null) {
         const src = audioCtx.createBufferSource();
         src.buffer = buffer;
         src.connect(audioCtx.destination);
-        
+
         // Adjust local playback speed (affects pitch because BufferSource changes playback rate)
         try {
             if (typeof ttsPlaybackRate === 'number' && isFinite(ttsPlaybackRate) && ttsPlaybackRate > 0) {
@@ -959,7 +951,7 @@ function createAudioSession(onIncomingJson, websocketURL = null, opts = null) {
         } catch (_) { }
 
         const currentTime = audioCtx.currentTime;
-        
+
         // If nextScheduledTime hasn't been initialized yet or is already in the past, start from the current time
         if (nextScheduledTime < currentTime) {
             nextScheduledTime = currentTime;
@@ -975,7 +967,7 @@ function createAudioSession(onIncomingJson, websocketURL = null, opts = null) {
         // Update the next chunk's start time = the end time of the current chunk
         nextScheduledTime = startTime + duration;
 
-        
+
         // ===================================================
 
         src.onended = () => {
@@ -986,6 +978,13 @@ function createAudioSession(onIncomingJson, websocketURL = null, opts = null) {
             sendJson({ action: "tts_chunk_played", chunk_index: currentChunkIndex, timestamp: Date.now() });
 
             if (playingSources.length === 0 && audioQueue.length === 0) {
+                // Delayed finish handling for TTS stream
+                if (pendingTTSStreamFinished) {
+                    pendingTTSStreamFinished = false;
+                    markTTSStreamState('finished');
+                    nextScheduledTime = 0;
+                    return;
+                }
                 // Case A: playback drained and backend already marked finished
                 if (ttsStreamFinished) {
                     sendJson({ action: "tts_playback_finished", timestamp: Date.now() });
@@ -1008,11 +1007,11 @@ function createAudioSession(onIncomingJson, websocketURL = null, opts = null) {
         };
 
         playingSources.push(src);
-        
+
         try {
             onIncomingJson({ action: 'client_tts_playback_started', data: { timestamp: Date.now() } });
         } catch (_) { }
-        
+
         if (audioQueue.length > 0) {
             playNextAudio();
         }

@@ -1,9 +1,9 @@
 async function loadXtalk() {
     try {
-    return await import("../../xtalk/index.js");
-  } catch (e) {
-    return await import("https://unpkg.com/xtalk-client@latest/dist/index.js");
-  }
+        return await import("../../xtalk/index.js");
+    } catch (e) {
+        return await import("https://unpkg.com/xtalk-client@latest/dist/index.js");
+    }
 }
 
 const { createConversation } = await loadXtalk();
@@ -321,6 +321,7 @@ function drawWaveform() {
 
     // Only draw one series: speaking for output; else for input
     let streamState = convo.state.streamState;
+    console.log('streamState:', streamState);
     if (outAnalyser && outDataArray && outBufferLength && streamState === 'speaking') {
         outAnalyser.getByteTimeDomainData(outDataArray);
         drawSeries(outDataArray, outBufferLength, getWaveformColor());
