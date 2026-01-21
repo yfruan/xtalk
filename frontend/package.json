@@ -1,7 +1,20 @@
 {
-  "name": "xtalk-frontend",
-  "version": "1.0.0",
-  "description": "Frontend API bundle for X-Talk (https://github.com/xcc-zach/xtalk)",
+  "name": "xtalk-client",
+  "version": "0.1.0",
+  "author": "xcczach",
+  "keywords": [
+    "xtalk",
+    "frontend",
+    "speech",
+    "ai",
+    "client",
+    "websocket"
+  ],
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/xcc-zach/xtalk"
+  },
+  "description": "Client API bundle for X-Talk (https://github.com/xcc-zach/xtalk)",
   "license": "Apache-2.0",
   "type": "module",
   "main": "./dist/index.umd.cjs",

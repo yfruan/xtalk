@@ -1,4 +1,13 @@
-import { createConversation } from "../../xtalk/index.js";
+async function loadXtalk() {
+    try {
+    return await import("../../xtalk/index.js");
+  } catch (e) {
+    return await import("https://unpkg.com/xtalk-client@latest/dist/index.js");
+  }
+}
+
+const { createConversation } = await loadXtalk();
+
 
 function getWebSocketURL() {
     const proto = location.protocol === "https:" ? "wss:" : "ws:";
